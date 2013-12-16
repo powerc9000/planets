@@ -103,7 +103,6 @@
 					}
 					return o;
 				},
-
 				collides: function(poly1, poly2) {
 					var points1 = this.getPoints(poly1),
 						points2 = this.getPoints(poly2),
@@ -124,6 +123,15 @@
 						dot,
 						nextPoint,
 						currentPoint;
+						
+					if(poly1.type === "circle" && poly2.type ==="circle"){
+						return circleCircle(poly1, poly2);
+					}else if(poly1.type === "circle"){
+						return circleRect(poly1, poly2);
+					}else if(poly2.type === "circle"){
+						return circleRect(poly2, poly1);
+					}
+					
 
 					//loop through the edges of Polygon 1
 					for (; i < l; i++) {
@@ -244,10 +252,24 @@
 						overlap: MTV2,
 						normal: MN
 					};
+					function circleRect(circle, rect){
+							
+					}
+					function pointInCircle(point, circle){
+						Math.pow(point.x - circle.position.x ,2) + Math.pow(point.y - circle.position.y, 2) < Math.pow(circle.radius,2);
+					}
+					function circleCircle(ob1, ob2){
 
+					}
+					function pointInRect(point, rect){
+
+					}
 				},
 
 				getPoints: function (obj){
+					if(obj.type === "circle"){
+						return [];
+					}
 					var x = obj.position.x,
 						y = obj.position.y,
 						width = obj.width,
@@ -437,10 +459,10 @@
 				return this;
 			},
 			drawCircle: function(x, y, radius, color, stroke){
-				var ctx = this.canvas.ctx;
+				var ctx = this.canvas.ctx, camera = this.canvas.camera;
 				ctx.save();
 				ctx.beginPath();
-				ctx.arc(x, y, radius, 0, 2*Math.PI, false);
+				ctx.arc((x - camera.position.x)/camera.zoomAmt, (y - camera.position.y)/camera.zoomAmt, radius / camera.zoomAmt, 0, 2*Math.PI, false);
 				ctx.fillStyle = color || "black";
 				ctx.fill();
 				this.stroke(stroke);
@@ -511,20 +533,23 @@
 		headOn.Camera.prototype = {
 			zoomIn: function(amt){
 				this.zoomAmt /= amt;
-				this.position = this.position.add(this.dimensions.mul(this.zoomAmt / 2))
+				this.position = this.center.sub(this.dimensions.mul(this.zoomAmt / 2))
 				return this;
 			},
 			zoomOut: function(amt){
-				this.position = this.position.sub(this.dimensions.mul(this.zoomAmt/2));
 				this.zoomAmt *= amt;
+				this.position = this.center.sub(this.dimensions.mul(this.zoomAmt / 2));
+				
 				return this;
 			},
 			move: function(vec){
 				this.position = this.position.add(vec);
 				this.center = this.position.add(headOn.Vector(this.width, this.height).mul(.5));
-				console.log(this.position);
-				console.log(this.center);
 				return this;
+			},
+			moveTo: function(vec){
+				this.position = vec.sub(this.dimensions.mul(.5));
+				this.center = this.position.add(this.dimensions.mul(.5));
 			}
 		}
 		vectorProto = {
