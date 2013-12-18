@@ -253,7 +253,23 @@
 						normal: MN
 					};
 					function circleRect(circle, rect){
-							
+						var newX = circle.position.x * Math.cos(-rect.angle);
+						var newY = circle.position.y * Math.sin(-rect.angle);
+						var circleDistance = {x:newX, y:newY};
+						var cornerDistance_sq;
+						circleDistance.x = Math.abs(circle.position.x - rect.position.x);
+					    circleDistance.y = Math.abs(circle.position.y - rect.position.y);
+
+					    if (circleDistance.x > (rect.width/2 + circle.radius)) { return false; }
+					    if (circleDistance.y > (rect.height/2 + circle.radius)) { return false; }
+
+					    if (circleDistance.x <= (rect.width/2)) { return true; } 
+					    if (circleDistance.y <= (rect.height/2)) { return true; }
+
+					    cornerDistance_sq = Math.pow(circleDistance.x - rect.width/2,2) +
+					                         Math.pow(circleDistance.y - rect.height/2, 2);
+
+					    return (cornerDistance_sq <= Math.pow(circle.radius,2));
 					}
 					function pointInCircle(point, circle){
 						Math.pow(point.x - circle.position.x ,2) + Math.pow(point.y - circle.position.y, 2) < Math.pow(circle.radius,2);
@@ -528,6 +544,9 @@
 			clear: function(){
 				var ctx = this.canvas.ctx;
 				ctx.clearRect(0,0, this.canvas.width, this.canvas.height)
+			},
+			setCamera: function(cam){
+				this.canvas.camera = cam;
 			}
 		}
 		headOn.Camera.prototype = {
@@ -548,8 +567,8 @@
 				return this;
 			},
 			moveTo: function(vec){
-				this.position = vec.sub(this.dimensions.mul(.5));
-				this.center = this.position.add(this.dimensions.mul(.5));
+				this.position = vec.sub(this.dimensions.mul(.5).mul(this.zoomAmt));
+				this.center = vec;
 			}
 		}
 		vectorProto = {
