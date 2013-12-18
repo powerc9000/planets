@@ -1,12 +1,12 @@
 (function(){
-	var c, $h = headOn, camera = new $h.Camera(1500,1500), cam2 = new $h.Camera(1500,1500);
+	var c, $h = headOn, camera = new $h.Camera(900,900), cam2 = new $h.Camera(900,900);
 	var keys = {};
 	var pointers = 0;
-	$h.canvas.create("main", 1500, 1500, camera);
+	$h.canvas.create("main", 900, 900, camera);
 	c = $h.canvas("main");
 	c.append("body");
 	c.canvas.canvas.style.border ="1px black solid"
-	camera.zoomAmt = 384*2*2;
+	camera.zoomAmt = 1;
 	var once;
 	$h.update(function(delta){
 		if(keys[38]){
@@ -31,7 +31,7 @@
 	$h.render(function(){
 
 		c.clear(c.width, c.height, 0, 0, "white");
-		c.setCamera(cam2);-
+		c.setCamera(cam2);
 		c.drawRect(1,c.height, c.width/2 , 0, "black");
 		c.drawRect(c.width,1, 0 , c.height/2, "black");
 		c.setCamera(camera);
